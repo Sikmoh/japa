@@ -1,0 +1,480 @@
+openapi: 3.0.0
+
+info:
+  title: "{{title}}"
+  version: "1.0.0"
+
+# Avoid having a definitive base path here. Set the path in the actual paths - facilitate versions
+# Example v1.0.0/login and v1.0.2 can both be specified
+
+servers:
+  - url: http://127.0.0.1:5003/
+    description: relative path example
+
+paths:
+  # -----------------------------------------------
+  # Request paths - REQUESTS
+  # -----------------------------------------------
+
+  /api/v1/onewaytrip:
+    get:
+      summary: Get fares for onewaytrip
+      tags:
+        - Onewaytrip
+      description: >
+        Required Headers:
+
+          Authorization request header
+
+            Bearer Valid Basic Access Token
+
+        Errors:
+
+          token-invalid, 401
+          authorisation-required, 401
+          not-found, 404
+
+      operationId: onewaytrip.endpoints.oneway
+      parameters:
+        - name : departure
+          description: departure airport
+          in: query
+          required: True
+          schema:
+            type: string
+        - name : arrival
+          description: arrival airport
+          in: query
+          schema:
+            type: string
+        - name : departure_date
+          description: date of departure(year-month-day)
+          in: query
+          schema:
+            type: string
+            format: date
+            pattern: ^([0-9]{4}[-/]?((0[13-9]|1[012])[-/]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-/]?31|02[-/]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-/]?02[-/]?29)$
+
+        - name: adults
+          description: number of adults
+          in: query
+          schema:
+            type: string
+        - name: children
+          description: number of children
+          in: query
+          schema:
+            type: string
+        - name: infants
+          description: number of infants
+          in: query
+          schema:
+            type: string
+        - name: cabin
+          description: cabin class
+          in: query
+          schema:
+            type: string
+        - name: currency
+          description: fare currency
+          in: query
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Returns price of airfare
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fares"
+
+      security:
+        - jwt: [ ]
+
+  /api/v1/roundtrip:
+    get:
+      summary: Get fares for round trips
+      tags:
+        - Roundtrip
+      description: >
+        Required Headers:
+
+          Authorization request header
+
+            Bearer Valid Basic Access Token
+
+        Errors:
+
+          token-invalid, 401
+          authorisation-required, 401
+          not-found, 404
+
+      operationId: roundtrip.endpoints.roundtrip
+      parameters:
+        - name: departure
+          description: departure airport
+          in: query
+          required: True
+          schema:
+            type: string
+        - name: arrival
+          description: arrival airport
+          in: query
+          schema:
+            type: string
+        - name: departure_date
+          description: date of departure(year-month-day)
+          in: query
+          schema:
+            type: string
+            format: date
+            pattern: ^([0-9]{4}[-/]?((0[13-9]|1[012])[-/]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-/]?31|02[-/]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-/]?02[-/]?29)$
+        - name: return_date
+          description: date of return (year-month-day)
+          in: query
+          schema:
+              type: string
+              format: date
+              pattern: ^([0-9]{4}[-/]?((0[13-9]|1[012])[-/]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-/]?31|02[-/]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-/]?02[-/]?29)$
+        - name: adults
+          description: number of adults
+          in: query
+          schema:
+            type: string
+        - name: children
+          description: number of children
+          in: query
+          schema:
+            type: string
+        - name: infants
+          description: number of infants
+          in: query
+          schema:
+            type: string
+        - name: cabin
+          description: cabin class
+          in: query
+          schema:
+            type: string
+        - name: currency
+          description: fare currency
+          in: query
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Returns price of airfare
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fares"
+
+      security:
+        - jwt: [ ]
+
+
+  /api/v1/signup:
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      description: >
+
+        Errors:
+
+            password-invalid, 400
+            email-invalid, 400
+            user-already-exists, 400
+            unsupported media type, 415
+
+      operationId: users.endpoints.signup
+      requestBody:
+        description: Signup Data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSignup"
+
+      responses:
+        "200":
+          description: Returns a success Response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/login:
+    post:
+      summary: Login with users credentials
+      tags:
+        - Users
+      description: >
+
+        Errors:
+
+            not-found, 404
+            password-invalid, 400
+            email-invalid, 400
+            account-disabled, 400
+
+      operationId: users.endpoints.login
+      requestBody:
+        description: Login Data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+
+      responses:
+        "200":
+          description: Returns a JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserLoginResponse"
+
+
+  /api/v1/logout:
+    post:
+      summary: Logout
+      tags:
+        - Users
+      description: >
+
+        Required Headers:
+
+          Authorization request header
+
+            Bearer Valid Token
+
+        Errors:
+
+            'token-invalid', 401
+            'authorisation-required', 401
+            'User NOT logged out - problem accessing token in request', 400
+
+      operationId: users.endpoints.logout
+      responses:
+        "200":
+          description: Returns 'ok' or an Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+      security:
+        - jwt: [ ]
+
+  /api/v1/email_verification:
+    get:
+      summary: Verifies user's email
+      tags:
+        - Users
+      description: >
+
+        Verifies user's email using an email-token generated when signing-up the user
+
+        Errors:
+
+            'token-invalid', 401
+            'authorisation-required', 401
+
+            'user-not-found', 404
+
+      operationId: users.endpoints.email_verification
+      parameters:
+        - name: token
+          description: Email verification token generated at sign-up time
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns OK
+
+  /api/v1/generate_tokens:
+    get:
+      summary: Generates new user access and refresh tokens
+      tags:
+        - Users
+      description: >
+
+        Required Headers:
+
+          Authorization request header
+            Bearer Valid Basic Access token
+
+        Errors:
+
+          'token-invalid', 401
+          'authorisation-required', 401
+          'user-not-found', 404
+
+      operationId: users.endpoints.generate_new_tokens
+      parameters:
+        - name: old_access_token
+          description: The old access token of the user
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns a new access token (token) and a new refresh token (refresh_token)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserTokens"
+
+      security:
+        - jwt_refresh: [ ]
+
+
+
+# -----------------------------------------------
+# COMPONENTS
+# -----------------------------------------------
+
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: auth.endpoints.decode_token
+
+    jwt_refresh:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: auth.endpoints.decode_refresh_token
+
+
+  schemas:
+  # -----------------------------------------------
+  # SCHEMAS
+  # -----------------------------------------------
+    Fares:
+      properties:
+        price:
+          description: price of cheapest flights
+          type: string
+        providerCode:
+          description: data provider
+          type: string
+        ecpc:
+          description: some data
+          type: string
+        remainingSeatsCount:
+          description: remaining seats on flight
+          type: integer
+        conditionIds:
+          description: terms and conditions
+          type: array
+
+
+
+    StatusOk:
+      type: string
+      description: API call success
+      default: ok
+
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/StatusOk"
+
+## -----------------------------------------------
+##  User REQUEST SCHEMA
+## -----------------------------------------------
+#
+    UserID:
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: integer
+          description: User ID
+
+    User:
+      allOf:
+        - $ref: "#/components/schemas/Email"
+        - $ref: "#/components/schemas/UserID"
+
+    UserSignup:
+      allOf:
+        - $ref: "#/components/schemas/AccessRole"
+        - $ref: "#/components/schemas/Credentials"
+
+    AccessRole:
+      properties:
+        access_role:
+          description: Access role of user
+          type: string
+          enum:
+            - admin
+            - basic
+          default: basic
+
+    Credentials:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Password"
+        - $ref: "#/components/schemas/Email"
+
+    Email:
+      required:
+        - email
+      properties:
+        email:
+          description: Email Address
+          type: string
+          pattern: ([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+
+
+    Password:
+      required:
+        - password
+      properties:
+        password:
+          description: Password
+          type: string
+          pattern: (?=\S{8,32})(?=\S*[A-Z])(?=\S*[a-z])(?=\S*[0-9])(?=\S*)(?<!\S)\S{8,32}(?=\s|\Z)
+
+    DOB:
+      required:
+        - date_of_birth
+      properties:
+        date_of_birth:
+          description: Birth Date(day-month-year)
+          type: string
+          format: date
+          pattern: ^(((0[1-9]|[12][0-9]|30)[-/]?(0[13-9]|1[012])|31[-/]?(0[13578]|1[02])|(0[1-9]|1[0-9]|2[0-8])[-/]?02)[-/]?[0-9]{4}|29[-/]?02[-/]?([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00))$
+
+    UserLoginResponse:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/UserTokens"
+        - $ref: "#/components/schemas/User"
+
+  # -----------------------------------------------
+  #  AUTH TOKEN RESPONSE SCHEMAS
+  # -----------------------------------------------
+
+    UserTokens:
+      type: object
+      required:
+        - token
+        - refresh_token
+      properties:
+        token:
+          type: string
+          format: byte
+          description: User's API calls token
+        refresh_token:
+          type: string
+          format: byte
+          description: User's refresh token
