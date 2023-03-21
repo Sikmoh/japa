@@ -2,13 +2,11 @@
 # ------------------------------------------------
 from basehandler import api_response
 from auth.core import permission
-#from restrictions.rate_limiting import limiter
 from onewaytrip.data_access import *
 
 from errors.v1.handlers import ApiError
 
 
-#@limiter.limit("5 per day")
 def oneway(**kwargs):
     """
             Fetch fare for onewaytrip
@@ -18,4 +16,6 @@ def oneway(**kwargs):
         """
     permission(kwargs['token_info'], access_role='basic')
     fare = FareDacc.onewaytrip(kwargs)
+    if fare is None:
+        raise ApiError('No fare found', 404)
     return api_response({'result': fare})

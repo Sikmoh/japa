@@ -88,6 +88,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Fares"
+#          headers:
+#            X-RateLimit-Limit:
+#              $ref: '#/components/headers/X-RateLimit-Limit'
+#            X-RateLimit-Remaining:
+#              $ref: '#/components/headers/X-RateLimit-Remaining'
+
+
 
       security:
         - jwt: [ ]
@@ -170,6 +177,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Fares"
+
+      security:
+        - jwt: [ ]
+
+  /api/v1/chatgpt:
+    get:
+      summary: Get an answer to a question
+      tags:
+        - Chat
+      description: >
+        Required Headers:
+
+          Authorization request header
+
+            Bearer Valid Basic Access Token
+
+        Errors:
+
+          token-invalid, 401
+          authorisation-required, 401
+          not-found, 404
+
+      operationId: search_engine.endpoint.search
+      parameters:
+        - name: question
+          description: ask chatGPT a question about a travel destination
+          in: query
+          required: True
+          schema:
+            type: string
+
+
+      responses:
+        "200":
+          description: Returns an answer to a question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Answer"
 
       security:
         - jwt: [ ]
@@ -352,6 +398,21 @@ components:
       bearerFormat: JWT
       x-bearerInfoFunc: auth.endpoints.decode_refresh_token
 
+#  headers:
+#    X-RateLimit-Limit:
+#      schema:
+#        type: integer
+#      description: Request limit per hour.
+#    X-RateLimit-Remaining:
+#      schema:
+#        type: integer
+#      description: The number of requests left for the time window.
+#    X-RateLimit-Reset:
+#      schema:
+#        type: string
+#        format: date-time
+#      description: The UTC date/time at which the current rate limit window resets.
+
 
   schemas:
   # -----------------------------------------------
@@ -374,6 +435,14 @@ components:
         conditionIds:
           description: terms and conditions
           type: array
+
+    Answer:
+      properties:
+        answer:
+          description: the reply to a question asked
+          type: string
+
+
 
 
 

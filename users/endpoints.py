@@ -50,6 +50,8 @@ def logout(**kwargs):
 
 def email_verification(**kwargs):
     try:
+        # import pdb
+        # pdb.set_trace()
         payload = verify_email_token(kwargs['token'])
         UserDacc.verify_email(payload['user_id'], payload['email_claim'])
         revoke_auth_token(kwargs['token'])

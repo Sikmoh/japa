@@ -21,7 +21,7 @@ def user_model():
     """
         Return the SQL statement to create the Users table
 
-    :return: string containing MySql user table creation statement
+    :return: string containing POSTGRESQL user table creation statement
     """
     return "(id int NOT NULL AUTO_INCREMENT, email VARCHAR(255), password VARCHAR(255), refresh_token VARCHAR(1024), " \
            "access_role VARCHAR(10), created DATETIME default now(), disabled BOOLEAN, email_verified BOOLEAN, " \
@@ -57,13 +57,13 @@ def create_user_table(db_connection):
     try:
         with db_connection.cursor() as cur:
             user = user_model()
-            #check_table = check_table_exists(db_connection)
+            check_table = check_table_exists(db_connection)
             create_users = "CREATE TABLE users " + user
-            # if not check_table:
-            cur.execute(create_users)
-            #     db_connection.commit()
-            # else:
-            #     pass
+            if not check_table:
+                cur.execute(create_users)
+                db_connection.commit()
+            else:
+                pass
     except Exception as e:
         raise ApiError("User table creation error", 500)
 

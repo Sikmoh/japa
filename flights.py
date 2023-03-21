@@ -31,6 +31,7 @@ URL = 'https://api.flightapi.io'
 class Fares(object):
 
     def __init__(self, **kwargs):
+        
 
         # Variables used for each instance of the class.
         self.fare_data = []

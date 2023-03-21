@@ -45,14 +45,22 @@ JWT_EMAIL_HOURS = 1
 
 
 MYSQL = {
-    'host': "localhost",  # 'localhost' #aerolab-mysql
+    'host': "airfare-mysql",  # 'localhost' #airfare-mysql
     'user': "root",
     'password': "00Apassword7",
     'database': "flightdata"
 }
 
+POSTGRESQL = {
+    'host': "localhost",  # 'localhost' #airfare-mysql
+    'user': "postgres",
+    'password': "00Apassword7",
+    'database': "postgres",
+    'port': "5432"
+}
+
 REDIS = {
-    "host": "localhost",  # 'localhost' #aerolab-redis
+    "host": "localhost",  # 'localhost' #airfare-redis
     'port': "6379",
     'db': "0",
     'password': "redisrocker"}
@@ -61,5 +69,5 @@ SMTP = {
     "host": "smtp-mail.outlook.com",
     "port": 587,
     "sender_email": "mohsikiru@outlook.com",
-    "sender_password": "MR93BEAN//93"
+    "sender_password": "MR93BEAN??"
 }

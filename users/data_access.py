@@ -15,7 +15,7 @@ from datetime import datetime
 from errors.v1.handlers import ApiError
 from auth.utils import check_password
 from auth.core import generate_jwt, decode_access_token, revoke_auth_token
-from database.mysql.db_utils import db_insert_update, db_query
+from database.postgresql.db_utils import db_insert_update, db_query
 from database.redis.rd_utils import redis_connection
 from utils import send_email
 
@@ -46,7 +46,7 @@ class UserDacc(object):
 
         sql = "INSERT INTO users (email, password, access_role, created, disabled, email_verified, logged_in) " \
               "VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        values = (data['email'], data['password'], data['access_role'], datetime.now(), 0, 0, 0)
+        values = (data['email'], data['password'], data['access_role'], datetime.now(), '0', '0', '0')
         db_insert_update(sql, values)
 
         # Retrieve the newly created user and send verification email.
@@ -78,7 +78,7 @@ class UserDacc(object):
 
                 # Update the record to state user logged in
                 sql = "UPDATE users SET logged_in = %s WHERE id = %s"
-                db_insert_update(sql, (1, user['id']))
+                db_insert_update(sql, ('1', user['id']))
                 return user['id'], token, refresh_token
             else:
                 raise ApiError(message="email-unverified", status_code=400)
@@ -94,7 +94,7 @@ class UserDacc(object):
         :return:
         """
         sql = "UPDATE users SET logged_in = %s WHERE id = %s"
-        db_insert_update(sql, (0, user_id))
+        db_insert_update(sql, ('0', user_id))
 
     @staticmethod
     def get_by_credentials(email, password):
@@ -189,7 +189,7 @@ class UserDacc(object):
                                    payload_claim={'email_claim': user['email']})
 
         params = {'token': token}
-        verification_url = f"{request.url_root}/api/v1/email_verification?" + urllib.parse.urlencode(params)
+        verification_url = f"{request.url_root}api/v1/email_verification?" + urllib.parse.urlencode(params)
 
         message_body = f"""Please verify account for {user['email']} by clicking on the following link:
             {verification_url}
@@ -217,7 +217,7 @@ class UserDacc(object):
         if user["email"] != user_email:
             raise ApiError(message="token-invalid", status_code=401)
 
-        sql = "UPDATE users SET email_verified = 1 WHERE id = %s"
+        sql = "UPDATE users SET email_verified = True WHERE id = %s"
 
         db_insert_update(sql, (user_id,))
 
